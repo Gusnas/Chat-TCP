@@ -18,6 +18,15 @@ def receive():
             message = client.recv(1024).decode('utf-8')
             if message == 'NICK':
                 client.send(nickname.encode('utf-8'))
+            elif message == 'TROCARNICK':
+                newNickname = input("Digite o nickname novo: ")
+                client.send(newNickname.encode('utf-8'))
+            elif message == 'SAIR':
+                print("Desconectado com sucesso!")
+                client.close()
+                break
+            elif message == 'USUARIOS':
+                print(message)
             else:
                 print(message)
         except:

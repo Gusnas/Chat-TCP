@@ -19,21 +19,21 @@ def handle(client):
     while True:
         try:
             message = client.recv(1024)
+            commandCheck(message)
             broadcast(message)
         except:
             index = clients.index(client)
             clients.remove(client)
             client.close()
             nickname = nicknames[index]
-            client.close()
-            nickname = nicknames[index]
             broadcast('{} saiu da sala!'.format(nickname).encode('utf-8'))
             nicknames.remove(nickname)
+            break
 
 def receive():
     while True:
         client, address = server.accept()
-        print("Conectado com {}".format(str(address)))
+        print("Conectado com endereço {}".format(str(address)))
 
         client.send('NICK'.encode('utf-8'))
         nickname = client.recv(1024).decode('utf-8')
@@ -43,7 +43,7 @@ def receive():
         nicknames.append(nickname)
         clients.append(client)
 
-        print("Usuario: {}".format(nickname))
+        print("Nickname: {}".format(nickname))
         broadcast("{} entrou na sala!".format(nickname).encode('utf-8'))
         client.send('Conectado ao servidor!'.encode('utf-8'))
 
@@ -54,17 +54,30 @@ def nicknameCheck(nickname):
     exists = nickname in nicknames
     return exists
 
-def userConnecteds(client):
+def userConnecteds():
     client.send('Usuarios conectados: {}'.format(nicknames).encode('utf-8'))
 
-def nickanameChange(nickname,newNickname,client):
+def nicknameChange(nickname,newNickname,client):
     nicknames.remove(nickname)
     nicknames.append(newNickname)
     broadcast('{} mudou o nickname para {}'.format(nickname,newNickname.encode('utf-8')))
 
 def quitChat(client,nickname):
     if client in clients:
-        broadcast('{} saiu da sala!'.format(nickname).encode('utf-8'))
-        clients.remove(client)
+            index = clients.index(client)
+            clients.remove(client)
+            client.close()
+            nickname = nicknames[index]
+            broadcast('{} saiu da sala!'.format(nickname).encode('utf-8'))
+            nicknames.remove(nickname)
+
+def commandCheck(message):
+    decodeMessage = message.decode('utf-8')
+    if decodeMessage == '/SAIR':
+        quitChat(client, nickname)
+    elif decodeMessage == '/USUARIOS':
+        userConnecteds()
+    elif decodeMessage == '/NICK':
+        nicknameChange(nickname, newNickname, client)
 
 receive()
