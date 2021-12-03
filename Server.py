@@ -6,7 +6,7 @@ port = 9999
 
 server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 server.bind((host,port))
-server.listen()
+server.listen(4)
 
 clients = []
 nicknames = []
@@ -61,5 +61,10 @@ def nickanameChange(nickname,newNickname,client):
     nicknames.remove(nickname)
     nicknames.append(newNickname)
     broadcast('{} mudou o nickname para {}'.format(nickname,newNickname.encode('utf-8')))
+
+def quitChat(client,nickname):
+    if client in clients:
+        broadcast('{} saiu da sala!'.format(nickname).encode('utf-8'))
+        clients.remove(client)
 
 receive()
